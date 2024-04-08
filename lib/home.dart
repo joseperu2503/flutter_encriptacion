@@ -37,7 +37,7 @@ class _HomeState extends State<Home> {
     });
 
     final respuestaDesencriptada = decryp(encrypResponse);
-    print(respuestaDesencriptada);
+    print(jsonDecode(respuestaDesencriptada));
   }
 
   @override

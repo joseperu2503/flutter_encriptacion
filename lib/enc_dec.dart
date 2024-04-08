@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:convert/convert.dart';
@@ -32,7 +33,7 @@ dynamic encryp(String text) {
   };
 }
 
-String decryp(EncrypResponse encrypResponse) {
+dynamic decryp(EncrypResponse encrypResponse) {
   Uint8List salt = Uint8List.fromList(hex.decode(encrypResponse.s));
   Uint8List iv = Uint8List.fromList(hex.decode(encrypResponse.iv));
 
@@ -53,7 +54,25 @@ String decryp(EncrypResponse encrypResponse) {
   final encrypted = Encrypted.fromBase64(encrypResponse.ct);
 
   final decrypted = encrypter.decrypt(encrypted, iv: IV(iv));
-  return decrypted;
+
+  try {
+    if (decrypted.contains('{') || decrypted.contains('[')) {
+      final decryptedData = jsonDecode(decrypted);
+      return decryptedData;
+    }
+    if (decrypted == 'true') {
+      return true;
+    }
+    if (decrypted == 'false') {
+      return false;
+    }
+    if (decrypted == 'null') {
+      return null;
+    }
+    return decrypted;
+  } catch (e) {
+    return decrypted;
+  }
 }
 
 Uint8List _generateRandomBytes(int length) {
